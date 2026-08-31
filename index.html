@@ -1,0 +1,819 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>VolleyPath</title>
+<style>
+:root{
+ --bg:#f5f7fb;--card:#fff;--text:#132033;--muted:#6b7280;--line:#e5e7eb;--accent:#2563eb;
+ --green:#16a34a;--orange:#f97316;--purple:#7c3aed;--red:#dc2626;--cyan:#0891b2;--gold:#ca8a04;
+ --blue-soft:#eff6ff;--green-soft:#f0fdf4;--orange-soft:#fff7ed;--purple-soft:#faf5ff;--shadow:0 4px 16px rgba(15,23,42,.06)
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit}
+.app{max-width:1180px;margin:auto;min-height:100vh}
+.top{background:linear-gradient(90deg,#ffffff 0%,#f8fbff 52%,#fbf9ff 100%);border-bottom:1px solid var(--line);padding:16px 22px;position:sticky;top:0;z-index:10}
+.brandrow{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-size:22px;font-weight:850;letter-spacing:-.02em;background:linear-gradient(90deg,var(--accent),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--muted);font-size:13px;margin-top:3px}
+.badge{padding:6px 10px;border-radius:999px;background:linear-gradient(135deg,#eff6ff,#faf5ff);color:#4338ca;font-size:12px;font-weight:800}
+nav{display:flex;gap:8px;overflow:auto;margin-top:14px;padding-bottom:2px}
+nav button{border:0;background:#f1f3f6;padding:10px 14px;border-radius:10px;font-weight:750;color:#4b5563;white-space:nowrap;cursor:pointer}
+nav button.active{background:linear-gradient(135deg,var(--accent),#4f46e5);color:#fff;box-shadow:0 4px 10px rgba(37,99,235,.18)}
+main{padding:22px}
+.view{display:none}.view.active{display:block}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid2{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow);position:relative;overflow:hidden}.card:before{content:'';position:absolute;left:0;top:0;width:100%;height:3px;background:linear-gradient(90deg,#dbeafe,#ede9fe);opacity:.9}
+.card h3{margin:0 0 10px}
+.big{font-size:34px;font-weight:850;letter-spacing:-.03em}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+.pill{display:inline-block;padding:5px 9px;border-radius:999px;font-size:12px;font-weight:750;background:linear-gradient(135deg,#eef2ff,#f5f3ff);color:#4338ca;margin:3px 3px 0 0}
+.item{padding:12px 0;border-bottom:1px solid var(--line)}
+.item:last-child{border-bottom:0}
+.row{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.wrap{flex-wrap:wrap}
+.tag{font-size:11px;font-weight:850;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+h1{margin:0 0 5px;font-size:28px;letter-spacing:-.03em}
+.hero{margin-bottom:18px}
+.progress{height:9px;background:#e5e7eb;border-radius:999px;overflow:hidden}
+.progress>i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--purple))}
+.btn{border:1px solid var(--line);background:#fff;padding:9px 12px;border-radius:10px;cursor:pointer;font-weight:700}
+.btn.primary{background:linear-gradient(135deg,var(--accent),#4f46e5);border-color:transparent;color:#fff;box-shadow:0 3px 9px rgba(37,99,235,.16)}
+.btn.danger{color:var(--red)}
+.check{width:24px;height:24px;border:1px solid #cbd5e1;border-radius:7px;background:#fff;cursor:pointer}
+.done{background:var(--green)!important;color:#fff;border-color:var(--green)!important}
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
+.dow{padding:10px;text-align:center;font-size:12px;font-weight:850;color:var(--muted);background:#f8fafc}
+.day{min-height:125px;padding:8px;border-top:1px solid var(--line);border-right:1px solid var(--line);cursor:pointer}
+.day:hover{background:#fafcff}.day:nth-child(7n){border-right:0}
+.date{font-weight:850;font-size:13px}
+.event{font-size:11px;margin-top:6px;padding:5px 6px;border-radius:7px;background:#eff6ff;color:#1d4ed8;overflow:hidden;text-overflow:ellipsis}
+.event.v{background:#eef2ff;color:#4338ca}.event.f{background:#f0fdf4;color:#15803d}.event.g{background:#fff7ed;color:#c2410c}.event.t{background:#faf5ff;color:#6d28d9}.event.r{background:#fef2f2;color:#b91c1c}
+.controls{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+.controls button{border:1px solid var(--line);background:#fff;padding:8px 12px;border-radius:9px;cursor:pointer}
+.formgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+label{font-size:12px;font-weight:800;color:#4b5563}
+input,select,textarea{width:100%;border:1px solid #d1d5db;border-radius:10px;padding:10px;background:#fff;color:var(--text);margin-top:5px}
+textarea{min-height:85px;resize:vertical}
+.stat{display:flex;align-items:end;justify-content:space-between;gap:10px}
+.kpi{font-size:28px;font-weight:850}
+.list-actions{display:flex;gap:6px}
+.sep{height:1px;background:var(--line);margin:14px 0}
+.timeline .item b{display:block;margin-bottom:3px}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:30px}
+.modal{position:fixed;inset:0;background:rgba(15,23,42,.35);display:none;align-items:center;justify-content:center;padding:20px;z-index:30}
+.modal.open{display:flex}.modalbox{width:min(520px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:18px;padding:18px;box-shadow:0 20px 60px rgba(15,23,42,.25)}
+@media(max-width:850px){.grid,.grid2{grid-template-columns:1fr}.calendar{grid-template-columns:repeat(7,minmax(82px,1fr));overflow-x:auto}.day{min-height:110px}.formgrid{grid-template-columns:1fr}}
+@media(max-width:600px){main{padding:14px}.top{padding:14px}.brand{font-size:20px}.card{padding:15px}.big{font-size:30px}}
+
+.card.accent-blue:before{background:linear-gradient(90deg,#3b82f6,#60a5fa)}
+.card.accent-purple:before{background:linear-gradient(90deg,#7c3aed,#a78bfa)}
+.card.accent-green:before{background:linear-gradient(90deg,#16a34a,#4ade80)}
+#gcse .card:nth-of-type(1):before{background:linear-gradient(90deg,#2563eb,#60a5fa)}
+#gcse .card:nth-of-type(2):before{background:linear-gradient(90deg,#0891b2,#67e8f9)}
+#gcse .card:nth-of-type(3):before{background:linear-gradient(90deg,#7c3aed,#c4b5fd)}
+#training .card:nth-of-type(1):before{background:linear-gradient(90deg,#7c3aed,#a78bfa)}
+#training .card:nth-of-type(2):before{background:linear-gradient(90deg,#16a34a,#86efac)}
+#training .card:nth-of-type(3):before{background:linear-gradient(90deg,#f97316,#fdba74)}
+#matches .card:nth-of-type(1):before{background:linear-gradient(90deg,#f97316,#facc15)}
+#profile .card:nth-of-type(1):before{background:linear-gradient(90deg,#2563eb,#7c3aed)}
+
+
+@media(max-width:650px){
+ nav{position:fixed;left:10px;right:10px;bottom:10px;z-index:20;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:16px;padding:7px;box-shadow:0 10px 30px rgba(15,23,42,.14);margin:0}
+ nav button{flex:1;padding:9px 8px;font-size:11px}
+ main{padding-bottom:90px}
+}
+.hero h1{background:linear-gradient(90deg,#132033,#334155);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+
+.momentum-hero{background:linear-gradient(135deg,rgba(37,99,235,.08),rgba(124,58,237,.08))}
+.momentum-top{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.xp-orb{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;font-size:28px;font-weight:800;box-shadow:0 10px 26px rgba(37,99,235,.22)}
+.xp-row{display:flex;justify-content:space-between;gap:12px;margin:18px 0 8px;font-size:13px;color:#64748b}
+.xpbar{height:13px;border-radius:999px;background:#e8eef8;overflow:hidden}
+.xpbar>div{height:100%;width:0;background:linear-gradient(90deg,#2563eb,#7c3aed);border-radius:999px;transition:.35s ease}
+.momentum-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}
+.momentum-stats div{padding:12px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.7);text-align:center}
+.momentum-stats b{display:block;font-size:22px}.momentum-stats span{font-size:11px;color:#64748b}
+.sectionhead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+.quest{display:flex;gap:12px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line)}
+.quest:last-child{border-bottom:0}.quest-main{flex:1}.quest-title{font-weight:750}.quest-reward{font-size:12px;color:#2563eb;font-weight:700}
+.quest button{min-width:76px}.quest.done{opacity:.6}.quest.done .quest-title{text-decoration:line-through}
+.achievement-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.achievement{padding:14px;border:1px solid var(--line);border-radius:16px;background:#fff;min-height:118px}
+.achievement.locked{opacity:.42;filter:grayscale(.8)}
+.achievement .ico{font-size:27px}.achievement .name{font-weight:800;margin-top:8px}.achievement .desc{font-size:12px;color:#64748b;margin-top:4px}
+.achievement.rare{box-shadow:inset 0 0 0 1px rgba(124,58,237,.25);background:linear-gradient(180deg,#fff,rgba(124,58,237,.04))}
+.quickxp{display:flex;flex-wrap:wrap;gap:8px}
+.xp-toast{position:fixed;left:50%;top:90px;transform:translateX(-50%);background:#132033;color:white;padding:12px 16px;border-radius:999px;z-index:999;box-shadow:0 10px 30px rgba(15,23,42,.25);font-weight:750;animation:xpPop 1.8s ease forwards}
+@keyframes xpPop{0%{opacity:0;transform:translate(-50%,-8px) scale(.95)}15%,75%{opacity:1;transform:translate(-50%,0) scale(1)}100%{opacity:0;transform:translate(-50%,-12px) scale(.98)}}
+@media(max-width:700px){.achievement-grid{grid-template-columns:repeat(2,1fr)}.momentum-stats{grid-template-columns:repeat(3,1fr)}}
+
+
+.momentum-nav{white-space:nowrap}
+.momentum-fab{
+  position:fixed;right:18px;bottom:18px;z-index:9999;
+  border:0;border-radius:999px;padding:12px 16px;
+  font:inherit;font-weight:800;background:#2563eb;color:#fff;
+  box-shadow:0 12px 28px rgba(15,23,42,.22);cursor:pointer
+}
+@media(min-width:900px){.momentum-fab{right:26px;bottom:26px}}
+
+</style>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2563eb">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="VolleyPath">
+<link rel="apple-touch-icon" href="volleypath_icon_180.png">
+<meta name="mobile-web-app-capable" content="yes">
+
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="brandrow">
+    <div>
+      <div class="brand">VolleyPath</div>
+      <div class="sub">Train. Study. Progress.</div>
+    </div>
+    <div class="badge">v3 · Preview</div>
+  </div>
+  <nav>
+    <button class="active" onclick="show('dashboard',this)">Dashboard</button><button class="navbtn momentum-nav" data-view="momentum" onclick="show('momentum',this)">⚡ Momentum</button>
+    <button onclick="show('calendar',this)">Calendar</button>
+    <button onclick="show('gcse',this)">GCSE</button>
+    <button onclick="show('training',this)">Training</button>
+    <button onclick="show('matches',this)">Matches</button>
+    <button onclick="show('profile',this)">Profile</button><button onclick="show('momentum',this)">Momentum</button><button onclick="show('settings',this)">Settings</button>
+  </nav>
+</header>
+
+<main>
+<section id="dashboard" class="view active">
+  <div class="hero"><h1>Dashboard</h1><div class="muted" id="today"></div></div>
+  <div class="grid">
+    <div class="card accent-purple"><div class="tag">Next pathway event</div><div class="big" id="count">—</div><div class="muted" id="nextTrialLabel"></div></div>
+    <div class="card accent-blue"><div class="tag">Revision streak</div><div class="big"><span id="streak">0</span> days</div><div class="muted">Mark a revision session complete each day to build it.</div></div>
+    <div class="card accent-green"><div class="tag">Latest vertical jump</div><div class="big"><span id="latestJump">—</span></div><div class="muted" id="jumpChange">Add a measurement in Training.</div></div>
+  </div>
+
+  <div class="grid2" style="margin-top:16px">
+    <div class="card">
+      <div class="row"><h3>Today's checklist</h3><button class="btn" onclick="resetTasks()">Reset</button></div>
+      <div id="tasks"></div>
+    </div>
+    <div class="card">
+      <h3>Weekly structure</h3>
+      <div class="item">Mon <b>Volleyball 20:30–22:15</b></div>
+      <div class="item">Tue <b>Football 18:30–19:30</b></div>
+      <div class="item">Wed <b>Volleyball 20:00–22:15</b></div>
+      <div class="item">Thu <b>Volleyball sometimes 19:30–21:40</b></div>
+      <div class="item">Fri <b>Main GCSE revision day</b></div>
+      <div class="item">Sat <b>Volleyball match</b></div>
+      <div class="item">Sun <b>Football match ~14:00</b></div>
+    </div>
+  </div>
+
+<div class="card" style="margin-top:16px">
+  <div style="display:flex;justify-content:space-between;gap:14px;align-items:center">
+    <div>
+      <div class="badge">⚡ NEW</div>
+      <h3 style="margin:8px 0 4px">Momentum</h3>
+      <div class="muted small">XP, levels, quests, streaks and achievements.</div>
+    </div>
+    <button class="btn primary" onclick="show('momentum',this)">Open Momentum</button>
+  </div>
+</div>
+</section>
+
+<section id="calendar" class="view">
+  <div class="controls"><button onclick="prevMonth()">←</button><h1 id="month"></h1><button onclick="nextMonth()">→</button></div>
+  <div class="row wrap" style="margin-bottom:12px">
+    <div class="muted small">Tap any date to add your own event.</div>
+    <button class="btn primary" onclick="openEventModal()">+ Add event</button>
+  </div>
+  <div class="calendar" id="cal"></div>
+</section>
+
+<section id="gcse" class="view">
+  <div class="hero"><h1>GCSE planner</h1><div class="muted">Track what you revise instead of just counting hours.</div></div>
+  <div class="grid">
+    <div class="card">
+      <h3>Add revision session</h3>
+      <div class="formgrid">
+        <div><label>Subject<select id="revSubject"></select></label></div>
+        <div><label>Minutes<input id="revMinutes" type="number" min="5" value="45"></label></div>
+        <div><label>Date<input id="revDate" type="date"></label></div>
+        <div><label>Type<select id="revType"><option>Active recall</option><option>Past paper</option><option>Flashcards</option><option>Practice questions</option><option>Notes / review</option></select></label></div>
+      </div>
+      <div style="margin-top:10px"><label>Topic<input id="revTopic" placeholder="e.g. Algebra, Macbeth, Cell biology"></label></div>
+      <button class="btn primary" style="margin-top:12px" onclick="addRevision()">Save session</button>
+    </div>
+    <div class="card">
+      <h3>This week's target</h3>
+      <div class="stat"><div><div class="kpi" id="weekMinutes">0 min</div><div class="muted">logged this week</div></div><div><b>Target ~6–7h</b></div></div>
+      <div class="sep"></div>
+      <div id="subjectTotals"></div>
+    </div>
+    <div class="card">
+      <h3>Suggested rotation</h3>
+      <div class="item">Mon <b>Maths / Science</b></div>
+      <div class="item">Tue <b>English / History</b></div>
+      <div class="item">Wed <b>Light review only</b></div>
+      <div class="item">Thu <b>Business / PE / Food Tech / Drama</b></div>
+      <div class="item">Fri <b>2 main subjects + past paper</b></div>
+      <div class="item">Sun <b>Weakest subject of the week</b></div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px"><h3>Recent revision</h3><div id="revisionLog"></div></div>
+</section>
+
+<section id="training" class="view">
+  <div class="hero"><h1>Training tracker</h1><div class="muted">Track setter work, gym sessions and vertical jump progress.</div></div>
+  <div class="grid">
+    <div class="card">
+      <h3>Log training</h3>
+      <div class="formgrid">
+        <div><label>Date<input type="date" id="trainDate"></label></div>
+        <div><label>Type<select id="trainType"><option>Volleyball</option><option>Setter practice</option><option>Gym</option><option>Recovery</option><option>Football</option></select></label></div>
+        <div><label>Minutes<input id="trainMinutes" type="number" min="5" value="60"></label></div>
+        <div><label>Intensity 1–10<input id="trainIntensity" type="number" min="1" max="10" value="7"></label></div>
+      </div>
+      <div style="margin-top:10px"><label>Notes<textarea id="trainNotes" placeholder="What improved? What felt difficult?"></textarea></label></div>
+      <button class="btn primary" style="margin-top:12px" onclick="addTraining()">Save training</button>
+    </div>
+    <div class="card">
+      <h3>Vertical jump</h3>
+      <div class="formgrid">
+        <div><label>Date<input type="date" id="jumpDate"></label></div>
+        <div><label>Jump (cm)<input id="jumpCm" type="number" step="0.1" min="1" placeholder="e.g. 54"></label></div>
+      </div>
+      <button class="btn primary" style="margin-top:12px" onclick="addJump()">Add measurement</button>
+      <div class="sep"></div>
+      <div id="jumpLog"></div>
+    </div>
+    <div class="card">
+      <h3>Setter priorities</h3>
+      <span class="pill">Consistency</span><span class="pill">Jump setting</span><span class="pill">Back sets</span><span class="pill">Out-of-system</span><span class="pill">Serve</span><span class="pill">Blocking</span><span class="pill">Communication</span><span class="pill">Decision-making</span>
+      <div class="sep"></div>
+      <p class="muted">Aim for quality. Your late Monday/Wednesday sessions already create a large weekly load.</p>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px"><h3>Training log</h3><div id="trainingLog"></div></div>
+</section>
+
+<section id="matches" class="view">
+  <div class="hero"><h1>Match tracker</h1><div class="muted">Keep results and a few useful notes so you can see your development over the season.</div></div>
+  <div class="grid2">
+    <div class="card">
+      <h3>Add match</h3>
+      <div class="formgrid">
+        <div><label>Date<input type="date" id="matchDate"></label></div>
+        <div><label>Opponent<input id="opponent" placeholder="Team name"></label></div>
+        <div><label>Result<input id="result" placeholder="e.g. W 3–1"></label></div>
+        <div><label>Your rating 1–10<input id="matchRating" type="number" min="1" max="10" value="7"></label></div>
+      </div>
+      <div style="margin-top:10px"><label>Notes<textarea id="matchNotes" placeholder="Best thing you did, biggest thing to improve"></textarea></label></div>
+      <button class="btn primary" style="margin-top:12px" onclick="addMatch()">Save match</button>
+    </div>
+    <div class="card">
+      <h3>Key pathway dates</h3>
+      <div id="trialList"></div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px"><h3>Match history</h3><div id="matchLog"></div></div>
+</section>
+
+<section id="profile" class="view">
+  <div class="hero"><h1>Athlete profile</h1><div class="muted">This is stored only in your browser on this device.</div></div>
+  <div class="grid2">
+    <div class="card">
+      <h3>Profile</h3>
+      <div class="formgrid">
+        <div><label>Name<input id="pName" placeholder="Your name"></label></div>
+        <div><label>Position<input id="pPosition" value="Setter"></label></div>
+        <div><label>Current level<input id="pLevel" value="Club / regional"></label></div>
+        <div><label>Long-term goal<input id="pGoal" value="Professional volleyball"></label></div>
+      </div>
+      <div style="margin-top:10px"><label>Main strengths<textarea id="pStrengths" placeholder="e.g. communication, quick decisions"></textarea></label></div>
+      <div style="margin-top:10px"><label>Main development areas<textarea id="pImprove" placeholder="e.g. jump setting, serve pressure"></textarea></label></div>
+      <button class="btn primary" style="margin-top:12px" onclick="saveProfile()">Save profile</button>
+    </div>
+    <div class="card">
+      <h3>Pathway</h3>
+      <div class="timeline">
+        <div class="item"><b>Now</b><span class="muted">Club / regional setter</span></div>
+        <div class="item"><b>Next</b><span class="muted">Higher-level junior volleyball / pathway</span></div>
+        <div class="item"><b>Then</b><span class="muted">National pathway / senior volleyball</span></div>
+        <div class="item"><b>Long term</b><span class="muted">Senior level → higher-level opportunities</span></div>
+      </div>
+      <div class="sep"></div>
+      <button class="btn danger" onclick="clearAll()">Reset all app data</button>
+    </div>
+  </div>
+</section>
+
+<section id="settings" class="view">
+  <div class="hero"><h1>Settings</h1><div class="muted">Set VolleyPath up for your own season.</div></div>
+  <div class="grid2">
+    <div class="card">
+      <h3>App setup</h3>
+      <div class="formgrid">
+        <div><label>Sport<input id="sSport" value="Volleyball"></label></div>
+        <div><label>Position<input id="sPosition" value="Setter"></label></div>
+        <div><label>Main academic goal<input id="sAcademic" value="GCSEs"></label></div>
+        <div><label>Season goal<input id="sSeason" placeholder="e.g. Make regional squad"></label></div>
+      </div>
+      <button class="btn primary" style="margin-top:12px" onclick="saveSettings()">Save settings</button>
+    </div>
+    <div class="card">
+      <h3>Privacy</h3>
+      <p>Your logs, profile and planner entries stay on this device in this preview. There is no account, cloud sync or advertising.</p>
+      <div class="sep"></div>
+      <h3>Release roadmap</h3>
+      <div class="item"><b>v3 Preview</b><div class="muted small">Public-ready interface + onboarding</div></div>
+      <div class="item"><b>Native build</b><div class="muted small">Package for iOS / Android</div></div>
+      <div class="item"><b>Store release</b><div class="muted small">Screenshots, privacy details, testing and review</div></div>
+    </div>
+  </div>
+</section>
+
+
+<section id="momentum" class="view">
+  <div class="hero">
+    <h1>Momentum</h1>
+    <div class="muted">Level up your real week.</div>
+  </div>
+
+  <div class="grid2">
+    <div class="card momentum-hero">
+      <div class="momentum-top">
+        <div>
+          <div class="badge">⚡ MOMENTUM</div>
+          <h2 id="levelTitle" style="margin:10px 0 4px">Level 1</h2>
+          <div class="muted" id="rankTitle">First Serve</div>
+        </div>
+        <div class="xp-orb"><span id="levelNum">1</span></div>
+      </div>
+
+      <div class="xp-row">
+        <span id="xpText">0 / 250 XP</span>
+        <span id="totalXpText">0 total XP</span>
+      </div>
+      <div class="xpbar"><div id="xpFill"></div></div>
+
+      <div class="momentum-stats">
+        <div><b id="streakNum">0</b><span>🔥 streak</span></div>
+        <div><b id="achCount">0</b><span>🏆 achievements</span></div>
+        <div><b id="questDoneCount">0</b><span>🎯 quests done</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Why am I doing this?</h3>
+      <textarea id="whyGoal" rows="5" placeholder="e.g. Make the pathway squad, smash my GCSEs, become a better setter..."></textarea>
+      <button class="btn primary" style="margin-top:10px" onclick="saveWhy()">Save my reason</button>
+      <div class="sep"></div>
+      <div class="muted small">This stays on your device and shows up when you need a reminder of the bigger goal.</div>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-top:16px">
+    <div class="card">
+      <div class="sectionhead">
+        <div><h3>Daily quests</h3><div class="muted small">Refreshes each day</div></div>
+        <div class="badge" id="dailyBonusLabel">+75 bonus XP</div>
+      </div>
+      <div id="dailyQuests"></div>
+    </div>
+
+    <div class="card">
+      <div class="sectionhead">
+        <div><h3>Weekly quests</h3><div class="muted small">Bigger goals, bigger XP</div></div>
+        <div class="badge">EPIC</div>
+      </div>
+      <div id="weeklyQuests"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <div class="sectionhead">
+      <div><h3>Achievements</h3><div class="muted small">Permanent milestones</div></div>
+      <div class="badge" id="achievementSummary">0 unlocked</div>
+    </div>
+    <div id="achievementGrid" class="achievement-grid"></div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3>Quick XP</h3>
+    <div class="muted small" style="margin-bottom:12px">Use these when you complete something outside the automatic logs.</div>
+    <div class="quickxp">
+      <button class="btn" onclick="awardXp(15,'10 min skill work')">🏐 10 min skill work +15</button>
+      <button class="btn" onclick="awardXp(20,'Recovery session')">🧘 Recovery +20</button>
+      <button class="btn" onclick="awardXp(25,'Focused revision')">📚 Focused revision +25</button>
+      <button class="btn" onclick="awardXp(30,'Training session')">⚡ Training +30</button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>VolleyPath · Offline-first · Data saves locally in your browser.</footer>
+</div>
+
+
+<div class="modal" id="onboarding">
+  <div class="modalbox">
+    <div class="badge" style="display:inline-block;margin-bottom:12px">Welcome to VolleyPath</div>
+    <h1>Train. Study. Progress.</h1>
+    <p class="muted">Build a schedule around school and volleyball without losing track of either.</p>
+    <div class="formgrid">
+      <div><label>Your sport<input id="oSport" value="Volleyball"></label></div>
+      <div><label>Your position<input id="oPosition" placeholder="e.g. Setter"></label></div>
+      <div><label>School stage<select id="oSchool"><option>GCSEs</option><option>A Levels</option><option>College</option><option>University</option><option>Other</option></select></label></div>
+      <div><label>Main season goal<input id="oGoal" placeholder="e.g. Make regional squad"></label></div>
+    </div>
+    <button class="btn primary" style="width:100%;margin-top:14px" onclick="finishOnboarding()">Start my season</button>
+  </div>
+</div>
+
+<div class="modal" id="eventModal">
+  <div class="modalbox">
+    <div class="row"><h3>Add calendar event</h3><button class="btn" onclick="closeEventModal()">✕</button></div>
+    <div class="formgrid">
+      <div><label>Date<input id="eventDate" type="date"></label></div>
+      <div><label>Category<select id="eventCategory"><option value="r">GCSE</option><option value="v">Volleyball</option><option value="f">Football</option><option value="t">Trial / pathway</option><option value="g">Other</option></select></label></div>
+    </div>
+    <div style="margin-top:10px"><label>Event<input id="eventTitle" placeholder="e.g. Maths past paper"></label></div>
+    <button class="btn primary" style="margin-top:12px" onclick="addCustomEvent()">Add event</button>
+  </div>
+</div>
+
+<script>
+const subjects=["Maths","English","Science","History","Food Tech","Drama","Business","PE"];
+const $=id=>document.getElementById(id);
+const todayISO=()=>{let d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+$("today").textContent=new Date().toLocaleDateString(undefined,{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+["revDate","trainDate","jumpDate","matchDate"].forEach(id=>$(id).value=todayISO());
+$("revSubject").innerHTML=subjects.map(s=>`<option>${s}</option>`).join("");
+
+const trialDates=[
+["2026-09-19","19 Sep 2026","Pathway / trial event"],["2026-10-24","24 Oct 2026","Pathway / trial event"],
+["2026-11-21","21 Nov 2026","Pathway / trial event"],["2026-12-19","19 Dec 2026","Pathway / trial event"],
+["2027-01-09","9 Jan 2027","Pathway / trial event"],["2027-02-13","13 Feb 2027","Pathway / trial event"],
+["2027-03-06","6 Mar 2027","Pathway / trial event"],["2027-04-18","18 Apr 2027","Potential squad session"],
+["2027-04-24","24 Apr 2027","Potential squad session"],["2027-05-22","22 May 2027","Potential squad session"],
+["2027-05-29","29–31 May 2027","Nationals"]
+];
+$("trialList").innerHTML=trialDates.map(x=>`<div class="item"><b>${x[1]}</b><div class="muted">${x[2]}</div></div>`).join("");
+
+function show(id,btn){document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));$(id).classList.add("active");document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));btn.classList.add("active");if(id==="calendar")renderCalendar();if(id==="gcse")renderRevision();if(id==="training")renderTraining();if(id==="matches")renderMatches();if(id==="profile")loadProfile()}
+
+function get(key,def=[]){try{return JSON.parse(localStorage.getItem(key)) ?? def}catch{return def}}
+function set(key,val){localStorage.setItem(key,JSON.stringify(val))}
+
+const baseTasks=["Check homework due tomorrow","Complete planned GCSE revision","Eat and hydrate around training","Prepare kit for next session"];
+function renderTasks(){let key="vp2_tasks_"+todayISO(),saved=get(key,[]);$("tasks").innerHTML=baseTasks.map((t,i)=>`<div class="item row"><span>${t}</span><button class="check ${saved[i]?'done':''}" onclick="toggleTask(${i})">${saved[i]?'✓':''}</button></div>`).join("")}
+function toggleTask(i){let key="vp2_tasks_"+todayISO(),saved=get(key,[]);saved[i]=!saved[i];set(key,saved);renderTasks()}
+function resetTasks(){localStorage.removeItem("vp2_tasks_"+todayISO());renderTasks()}
+renderTasks();
+
+function updateTrialCount(){
+ let now=new Date();
+ let future=trialDates.slice(0,7).map(x=>[new Date(x[0]+"T09:00:00"),x]).find(x=>x[0]>=now);
+ if(!future){$("count").textContent="Trials complete";$("nextTrialLabel").textContent="Next stage: selected squad";return}
+ $("count").textContent=Math.ceil((future[0]-now)/86400000)+" days";
+ $("nextTrialLabel").textContent=future[1][1]+" · "+future[1][2];
+}
+updateTrialCount();
+
+function addRevision(){
+ let arr=get("vp2_revision");
+ let item={id:Date.now(),date:$("revDate").value,subject:$("revSubject").value,minutes:+$("revMinutes").value,type:$("revType").value,topic:$("revTopic").value||"General"};
+ arr.unshift(item);set("vp2_revision",arr);$("revTopic").value="";renderRevision();updateStreak()
+}
+function renderRevision(){
+ let arr=get("vp2_revision");
+ $("revisionLog").innerHTML=arr.length?arr.slice(0,20).map(x=>`<div class="item row wrap"><div><b>${x.subject} · ${x.topic}</b><div class="muted small">${x.date} · ${x.minutes} min · ${x.type}</div></div><button class="btn danger" onclick="delItem('vp2_revision',${x.id},renderRevision)">Delete</button></div>`).join(""):`<div class="muted">No revision logged yet.</div>`;
+ let now=new Date(),monday=new Date(now);monday.setDate(now.getDate()-((now.getDay()+6)%7));monday.setHours(0,0,0,0);
+ let mins=arr.filter(x=>new Date(x.date+"T12:00:00")>=monday).reduce((a,b)=>a+b.minutes,0);$("weekMinutes").textContent=mins+" min";
+ $("subjectTotals").innerHTML=subjects.map(s=>{let total=arr.filter(x=>x.subject===s).reduce((a,b)=>a+b.minutes,0);return `<div class="item row"><span>${s}</span><b>${total} min</b></div>`}).join("")
+}
+function updateStreak(){
+ let arr=get("vp2_revision"),days=[...new Set(arr.map(x=>x.date))].sort().reverse(),streak=0,d=new Date();
+ for(let i=0;i<60;i++){let iso=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");if(days.includes(iso)){streak++;d.setDate(d.getDate()-1)}else if(i===0){d.setDate(d.getDate()-1)}else break}
+ $("streak").textContent=streak
+}
+renderRevision();updateStreak();
+
+function addTraining(){
+ let arr=get("vp2_training");arr.unshift({id:Date.now(),date:$("trainDate").value,type:$("trainType").value,minutes:+$("trainMinutes").value,intensity:+$("trainIntensity").value,notes:$("trainNotes").value});set("vp2_training",arr);$("trainNotes").value="";renderTraining()
+}
+function addJump(){
+ if(!$("jumpCm").value)return;
+ let arr=get("vp2_jumps");arr.unshift({id:Date.now(),date:$("jumpDate").value,cm:+$("jumpCm").value});set("vp2_jumps",arr);$("jumpCm").value="";renderTraining();renderLatestJump()
+}
+function renderTraining(){
+ let arr=get("vp2_training");
+ $("trainingLog").innerHTML=arr.length?arr.slice(0,25).map(x=>`<div class="item row wrap"><div><b>${x.type} · ${x.minutes} min</b><div class="muted small">${x.date} · intensity ${x.intensity}/10${x.notes?" · "+x.notes:""}</div></div><button class="btn danger" onclick="delItem('vp2_training',${x.id},renderTraining)">Delete</button></div>`).join(""):`<div class="muted">No training logged yet.</div>`;
+ let jumps=get("vp2_jumps");
+ $("jumpLog").innerHTML=jumps.length?jumps.slice(0,8).map(x=>`<div class="item row"><span>${x.date}</span><b>${x.cm} cm</b></div>`).join(""):`<div class="muted">No measurements yet.</div>`;
+}
+function renderLatestJump(){
+ let j=get("vp2_jumps").slice().sort((a,b)=>b.date.localeCompare(a.date));
+ if(!j.length){$("latestJump").textContent="—";$("jumpChange").textContent="Add a measurement in Training.";return}
+ $("latestJump").textContent=j[0].cm+" cm";
+ if(j.length>1){let diff=(j[0].cm-j[1].cm).toFixed(1);$("jumpChange").textContent=(diff>=0?"+":"")+diff+" cm vs previous measurement"} else $("jumpChange").textContent="First measurement logged."
+}
+renderTraining();renderLatestJump();
+
+function addMatch(){
+ let arr=get("vp2_matches");arr.unshift({id:Date.now(),date:$("matchDate").value,opponent:$("opponent").value||"Unknown opponent",result:$("result").value||"—",rating:+$("matchRating").value,notes:$("matchNotes").value});set("vp2_matches",arr);$("opponent").value="";$("result").value="";$("matchNotes").value="";renderMatches()
+}
+function renderMatches(){
+ let arr=get("vp2_matches");
+ $("matchLog").innerHTML=arr.length?arr.map(x=>`<div class="item row wrap"><div><b>${x.date} · ${x.opponent} · ${x.result}</b><div class="muted small">Rating ${x.rating}/10${x.notes?" · "+x.notes:""}</div></div><button class="btn danger" onclick="delItem('vp2_matches',${x.id},renderMatches)">Delete</button></div>`).join(""):`<div class="muted">No matches logged yet.</div>`
+}
+renderMatches();
+
+function delItem(key,id,rerender){let arr=get(key).filter(x=>x.id!==id);set(key,arr);rerender();if(key==="vp2_revision")updateStreak();if(key==="vp2_jumps")renderLatestJump()}
+
+function saveProfile(){
+ set("vp2_profile",{name:$("pName").value,position:$("pPosition").value,level:$("pLevel").value,goal:$("pGoal").value,strengths:$("pStrengths").value,improve:$("pImprove").value});
+ alert("Profile saved.")
+}
+function loadProfile(){let p=get("vp2_profile",{});$("pName").value=p.name||"";$("pPosition").value=p.position||"Setter";$("pLevel").value=p.level||"Club / regional";$("pGoal").value=p.goal||"Professional volleyball";$("pStrengths").value=p.strengths||"";$("pImprove").value=p.improve||""}
+loadProfile();
+
+let viewDate=new Date(2026,8,1);
+const baseEvents=[
+["2026-09-19","Pathway / trial event","t"],["2026-10-24","Pathway / trial event","t"],["2026-11-21","Pathway / trial event","t"],["2026-12-19","Pathway / trial event","t"],
+["2027-01-09","Pathway / trial event","t"],["2027-02-13","Pathway / trial event","t"],["2027-03-06","Pathway / trial event","t"],["2027-04-18","Potential squad","t"],["2027-04-24","Potential squad","t"],["2027-05-22","Potential squad","t"],["2027-05-29","Nationals","g"],["2027-05-30","Nationals","g"],["2027-05-31","Nationals","g"]
+];
+function localISO(dt){return dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0")}
+function renderCalendar(){
+ let y=viewDate.getFullYear(),m=viewDate.getMonth();$("month").textContent=viewDate.toLocaleDateString(undefined,{month:"long",year:"numeric"});
+ let first=(new Date(y,m,1).getDay()+6)%7,days=new Date(y,m+1,0).getDate(),out=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map(x=>`<div class="dow">${x}</div>`).join("");
+ for(let i=0;i<first;i++)out+="<div class='day'></div>";
+ let custom=get("vp2_events");
+ for(let d=1;d<=days;d++){
+   let dt=new Date(y,m,d),iso=localISO(dt),dow=dt.getDay();
+   let es=baseEvents.filter(e=>e[0]===iso).concat(custom.filter(e=>e.date===iso).map(e=>[e.date,e.title,e.category])).map(e=>`<div class="event ${e[2]}">${e[1]}</div>`).join("");
+   if(dow===1)es+=`<div class="event v">🏐 20:30–22:15</div>`;
+   if(dow===2)es+=`<div class="event f">⚽ 18:30–19:30</div>`;
+   if(dow===3)es+=`<div class="event v">🏐 20:00–22:15</div>`;
+   if(dow===4)es+=`<div class="event v">🏐 sometimes 19:30–21:40</div>`;
+   if(dow===5)es+=`<div class="event r">📚 Main revision day</div>`;
+   if(dow===6)es+=`<div class="event v">🏐 Match</div>`;
+   if(dow===0)es+=`<div class="event f">⚽ Match ~14:00</div>`;
+   out+=`<div class="day" onclick="openEventModal('${iso}')"><div class="date">${d}</div>${es}</div>`;
+ }
+ $("cal").innerHTML=out
+}
+function prevMonth(){viewDate.setMonth(viewDate.getMonth()-1);renderCalendar()}
+function nextMonth(){viewDate.setMonth(viewDate.getMonth()+1);renderCalendar()}
+function openEventModal(date=""){$("eventModal").classList.add("open");$("eventDate").value=date||todayISO()}
+function closeEventModal(){$("eventModal").classList.remove("open")}
+function addCustomEvent(){
+ if(!$("eventDate").value||!$("eventTitle").value)return;
+ let arr=get("vp2_events");arr.push({id:Date.now(),date:$("eventDate").value,title:$("eventTitle").value,category:$("eventCategory").value});set("vp2_events",arr);$("eventTitle").value="";closeEventModal();renderCalendar()
+}
+renderCalendar();
+
+function clearAll(){
+ if(confirm("Reset all VolleyPath data saved in this browser?")){
+   Object.keys(localStorage).filter(k=>k.startsWith("vp2_")).forEach(k=>localStorage.removeItem(k));
+   location.reload()
+ }
+}
+
+function saveSettings(){
+  let s={sport:$("sSport").value,position:$("sPosition").value,academic:$("sAcademic").value,season:$("sSeason").value};
+  set("vp3_settings",s); alert("Settings saved.");
+}
+function loadSettings(){
+  let s=get("vp3_settings",{});
+  if($("sSport")) $("sSport").value=s.sport||"Volleyball";
+  if($("sPosition")) $("sPosition").value=s.position||"Setter";
+  if($("sAcademic")) $("sAcademic").value=s.academic||"GCSEs";
+  if($("sSeason")) $("sSeason").value=s.season||"";
+}
+function finishOnboarding(){
+  let s={sport:$("oSport").value,position:$("oPosition").value,academic:$("oSchool").value,season:$("oGoal").value};
+  set("vp3_settings",s); localStorage.setItem("vp3_onboarded","yes"); $("onboarding").classList.remove("open"); loadSettings();
+  $("pPosition").value=s.position||"Setter"; $("pGoal").value=s.season||"Improve and progress";
+}
+loadSettings();
+if(localStorage.getItem("vp3_onboarded")!=="yes") $("onboarding").classList.add("open");
+
+
+const MOM_KEY='vp_momentum_v1';
+
+function mGet(){
+  try{return JSON.parse(localStorage.getItem(MOM_KEY))||{};}catch(e){return {};}
+}
+function mSave(s){localStorage.setItem(MOM_KEY,JSON.stringify(s));}
+function isoDay(d=new Date()){return d.toISOString().slice(0,10);}
+function isoWeek(){
+  const d=new Date(); const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
+  const day=t.getUTCDay()||7; t.setUTCDate(t.getUTCDate()+4-day);
+  const y=new Date(Date.UTC(t.getUTCFullYear(),0,1));
+  const w=Math.ceil((((t-y)/86400000)+1)/7);
+  return t.getUTCFullYear()+'-W'+String(w).padStart(2,'0');
+}
+function xpNeeded(level){return 250 + (level-1)*75;}
+function rankFor(level){
+  const ranks=[
+    [1,'First Serve'],[3,'Routine Builder'],[5,'Court Scholar'],[8,'Regional Grind'],
+    [12,'Momentum Athlete'],[16,'Pathway Chaser'],[20,'Elite Habits'],[25,'Next Level']
+  ];
+  let r='First Serve'; ranks.forEach(x=>{if(level>=x[0])r=x[1]}); return r;
+}
+function normalizeMomentum(){
+  let s=mGet();
+  s.totalXp=s.totalXp||0; s.level=s.level||1; s.currentXp=s.currentXp||0;
+  s.questsDone=s.questsDone||0; s.streak=s.streak||0; s.lastActive=s.lastActive||null;
+  s.achievements=s.achievements||[]; s.daily=s.daily||{}; s.weekly=s.weekly||{};
+  s.stats=s.stats||{quick:0,revision:0,training:0,recovery:0,skill:0,perfectDays:0};
+  s.why=s.why||'';
+  // Level up loop
+  while(s.currentXp>=xpNeeded(s.level)){
+    s.currentXp-=xpNeeded(s.level); s.level++;
+  }
+  mSave(s); return s;
+}
+function toastXp(msg){
+  const x=document.createElement('div');x.className='xp-toast';x.textContent=msg;document.body.appendChild(x);
+  setTimeout(()=>x.remove(),1900);
+}
+function touchStreak(s){
+  const today=isoDay();
+  if(s.lastActive===today)return;
+  if(!s.lastActive){s.streak=1;}
+  else{
+    const a=new Date(s.lastActive+'T00:00:00'), b=new Date(today+'T00:00:00');
+    const diff=Math.round((b-a)/86400000);
+    if(diff===1)s.streak++;
+    else if(diff>1)s.streak=1;
+  }
+  s.lastActive=today;
+}
+function awardXp(amount,reason,stat){
+  let s=normalizeMomentum();
+  s.totalXp+=amount;s.currentXp+=amount;
+  if(stat && s.stats[stat]!==undefined)s.stats[stat]++;
+  touchStreak(s);
+  let oldLevel=s.level;
+  while(s.currentXp>=xpNeeded(s.level)){s.currentXp-=xpNeeded(s.level);s.level++;}
+  mSave(s);
+  toastXp('+'+amount+' XP · '+reason);
+  if(s.level>oldLevel)setTimeout(()=>toastXp('⚡ LEVEL '+s.level+' · '+rankFor(s.level)),500);
+  checkAchievements(); renderMomentum();
+}
+function saveWhy(){let s=normalizeMomentum();s.why=document.getElementById('whyGoal').value.trim();mSave(s);toastXp('Goal saved ⚡');}
+function dailyQuestDefs(){
+  return [
+    {id:'study',icon:'📚',title:'Focus block',desc:'Complete one focused revision block',xp:30},
+    {id:'move',icon:'🏐',title:'Move forward',desc:'Train, do skill work, or complete recovery',xp:35},
+    {id:'reflect',icon:'🧠',title:'One thing better',desc:'Write down one thing you improved today',xp:20}
+  ];
+}
+function weeklyQuestDefs(){
+  return [
+    {id:'consistency',icon:'🔥',title:'Consistency week',desc:'Complete 5 quests this week',xp:150,target:5},
+    {id:'balanced',icon:'⚖️',title:'Student-athlete balance',desc:'Complete both study and sport quests this week',xp:120,target:2},
+    {id:'epic',icon:'🟣',title:'EPIC: Trial Ready',desc:'Complete 8 total quests this week',xp:300,target:8}
+  ];
+}
+function ensureQuestBuckets(){
+  let s=normalizeMomentum(),d=isoDay(),w=isoWeek();
+  if(s.daily.date!==d)s.daily={date:d,done:[],bonus:false,reflection:''};
+  if(s.weekly.week!==w)s.weekly={week:w,done:[],questCount:0,bonus:false,categories:[]};
+  mSave(s);return s;
+}
+function completeDaily(id){
+  let s=ensureQuestBuckets(); if(s.daily.done.includes(id))return;
+  const q=dailyQuestDefs().find(x=>x.id===id); if(!q)return;
+  s.daily.done.push(id); s.questsDone++; s.weekly.questCount++;
+  if(id==='study'&&!s.weekly.categories.includes('study'))s.weekly.categories.push('study');
+  if(id==='move'&&!s.weekly.categories.includes('sport'))s.weekly.categories.push('sport');
+  mSave(s); awardXp(q.xp,q.title);
+  s=ensureQuestBuckets();
+  if(s.daily.done.length===dailyQuestDefs().length && !s.daily.bonus){
+    s.daily.bonus=true;s.stats.perfectDays++;mSave(s);awardXp(75,'Daily quest clear bonus');
+  }
+}
+function weeklyProgress(q,s){
+  if(q.id==='balanced')return s.weekly.categories.length;
+  return s.weekly.questCount||0;
+}
+function claimWeekly(id){
+  let s=ensureQuestBuckets(); if(s.weekly.done.includes(id))return;
+  const q=weeklyQuestDefs().find(x=>x.id===id); if(!q)return;
+  if(weeklyProgress(q,s)<q.target)return;
+  s.weekly.done.push(id);s.questsDone++;mSave(s);awardXp(q.xp,q.title);
+}
+const ACH=[
+  {id:'firstxp',ico:'⚡',name:'First Step',desc:'Earn your first XP',test:s=>s.totalXp>=1},
+  {id:'lvl5',ico:'🏐',name:'Court Scholar',desc:'Reach Level 5',test:s=>s.level>=5},
+  {id:'streak3',ico:'🔥',name:'Heating Up',desc:'Reach a 3-day streak',test:s=>s.streak>=3},
+  {id:'streak7',ico:'🔥',name:'7-Day Momentum',desc:'Reach a 7-day streak',test:s=>s.streak>=7},
+  {id:'quests10',ico:'🎯',name:'Quest Hunter',desc:'Complete 10 quests',test:s=>s.questsDone>=10},
+  {id:'perfect3',ico:'✅',name:'Clean Sweep',desc:'Clear all daily quests 3 times',test:s=>s.stats.perfectDays>=3},
+  {id:'xp1000',ico:'💎',name:'Four Figures',desc:'Earn 1,000 total XP',test:s=>s.totalXp>=1000,rare:true},
+  {id:'lvl12',ico:'🟣',name:'Regional Grind',desc:'Reach Level 12',test:s=>s.level>=12,rare:true},
+  {id:'xp5000',ico:'👑',name:'Next Level',desc:'Earn 5,000 total XP',test:s=>s.totalXp>=5000,rare:true}
+];
+function checkAchievements(){
+  let s=normalizeMomentum(),newOnes=[];
+  ACH.forEach(a=>{if(a.test(s)&&!s.achievements.includes(a.id)){s.achievements.push(a.id);newOnes.push(a);}});
+  mSave(s);
+  newOnes.forEach((a,i)=>setTimeout(()=>toastXp('🏆 Achievement · '+a.name),350+i*450));
+}
+function renderMomentum(){
+  if(!document.getElementById('levelNum'))return;
+  let s=ensureQuestBuckets();checkAchievements();s=normalizeMomentum();
+  document.getElementById('levelNum').textContent=s.level;
+  document.getElementById('levelTitle').textContent='Level '+s.level;
+  document.getElementById('rankTitle').textContent=rankFor(s.level);
+  document.getElementById('xpText').textContent=s.currentXp+' / '+xpNeeded(s.level)+' XP';
+  document.getElementById('totalXpText').textContent=s.totalXp+' total XP';
+  document.getElementById('xpFill').style.width=Math.min(100,(s.currentXp/xpNeeded(s.level))*100)+'%';
+  document.getElementById('streakNum').textContent=s.streak;
+  document.getElementById('achCount').textContent=s.achievements.length;
+  document.getElementById('questDoneCount').textContent=s.questsDone;
+  document.getElementById('whyGoal').value=s.why||'';
+
+  const dq=document.getElementById('dailyQuests');dq.innerHTML='';
+  dailyQuestDefs().forEach(q=>{
+    const done=s.daily.done.includes(q.id);
+    const row=document.createElement('div');row.className='quest'+(done?' done':'');
+    row.innerHTML=`<div style="font-size:24px">${q.icon}</div><div class="quest-main"><div class="quest-title">${q.title}</div><div class="muted small">${q.desc}</div><div class="quest-reward">+${q.xp} XP</div></div><button class="btn ${done?'':'primary'}" ${done?'disabled':''} onclick="completeDaily('${q.id}')">${done?'Done ✓':'Complete'}</button>`;
+    dq.appendChild(row);
+  });
+  document.getElementById('dailyBonusLabel').textContent=s.daily.bonus?'Bonus claimed ✓':'+75 bonus XP';
+
+  const wq=document.getElementById('weeklyQuests');wq.innerHTML='';
+  weeklyQuestDefs().forEach(q=>{
+    const prog=weeklyProgress(q,s),done=s.weekly.done.includes(q.id),ready=prog>=q.target;
+    const row=document.createElement('div');row.className='quest'+(done?' done':'');
+    row.innerHTML=`<div style="font-size:24px">${q.icon}</div><div class="quest-main"><div class="quest-title">${q.title}</div><div class="muted small">${q.desc}</div><div class="quest-reward">${Math.min(prog,q.target)} / ${q.target} · +${q.xp} XP</div></div><button class="btn ${ready&&!done?'primary':''}" ${(!ready||done)?'disabled':''} onclick="claimWeekly('${q.id}')">${done?'Claimed ✓':ready?'Claim':'Locked'}</button>`;
+    wq.appendChild(row);
+  });
+
+  const ag=document.getElementById('achievementGrid');ag.innerHTML='';
+  ACH.forEach(a=>{
+    const unlocked=s.achievements.includes(a.id);
+    const el=document.createElement('div');el.className='achievement '+(unlocked?'':'locked ')+(a.rare?'rare':'');
+    el.innerHTML=`<div class="ico">${unlocked?a.ico:'🔒'}</div><div class="name">${a.name}</div><div class="desc">${a.desc}${a.rare?' · Rare':''}</div>`;
+    ag.appendChild(el);
+  });
+  document.getElementById('achievementSummary').textContent=s.achievements.length+' / '+ACH.length+' unlocked';
+}
+document.addEventListener('DOMContentLoaded',()=>{normalizeMomentum();renderMomentum();});
+
+
+(function(){
+  const oldShow = window.show;
+  window.show = function(id, el){
+    try{
+      if(typeof oldShow === 'function') oldShow(id, el);
+    }catch(e){}
+    const target=document.getElementById(id);
+    if(!target) return;
+    document.querySelectorAll('.view').forEach(v=>{
+      if(v.id===id){
+        v.style.display='';
+        v.classList.add('active');
+        v.hidden=false;
+      }else{
+        v.classList.remove('active');
+        // Respect app's normal CSS, but force-hide competing views if needed
+        if(getComputedStyle(v).display!=='none') v.style.display='none';
+      }
+    });
+    target.style.display='block';
+    target.scrollIntoView({behavior:'smooth',block:'start'});
+    if(id==='momentum' && typeof renderMomentum==='function') renderMomentum();
+  };
+})();
+
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js').catch(() => {});
+  });
+}
+</script>
+
+</body>
+</html>
